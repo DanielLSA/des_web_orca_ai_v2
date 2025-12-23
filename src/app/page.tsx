@@ -12,7 +12,7 @@ export default function HomePage() {
         </div>
       </Card>
       <Card>
-        <img src="/hero-placeholder.png" alt="Painel financeiro ilustrativo" />
+        <img src="/hero.png" alt="Painel financeiro ilustrativo" />
       </Card>
     </section>
   );
