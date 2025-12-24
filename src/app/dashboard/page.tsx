@@ -9,7 +9,7 @@ const kpis = [
 export default function DashboardPage() {
   return (
     <section className="grid" style={{ gap: 16 }}>
-      <h2>Dashboard (demo estático – Sprint 1)</h2>
+      <h2>Dashboard</h2>
 
       <div className="grid" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
         {kpis.map((k) => (
