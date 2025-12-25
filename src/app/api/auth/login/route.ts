@@ -2,56 +2,45 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
-export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const { email, password } = body;
+export async function POST(req: Request) {
+  const { email, password } = await req.json();
 
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: "E-mail e senha são obrigatórios" },
-        { status: 400 }
-      );
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { error: "Credenciais inválidas" },
-        { status: 401 }
-      );
-    }
-
-    const passwordMatch = await bcrypt.compare(
-      password,
-      user.passwordHash
-    );
-
-    if (!passwordMatch) {
-      return NextResponse.json(
-        { error: "Credenciais inválidas" },
-        { status: 401 }
-      );
-    }
-
+  if (!email || !password) {
     return NextResponse.json(
-      {
-        message: "Login realizado com sucesso",
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-        },
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Erro interno no servidor" },
-      { status: 500 }
+      { error: "Dados inválidos" },
+      { status: 400 }
     );
   }
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    return NextResponse.json(
+      { error: "Usuário não encontrado" },
+      { status: 401 }
+    );
+  }
+
+  const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+
+  if (!passwordMatch) {
+    return NextResponse.json(
+      { error: "Senha incorreta" },
+      { status: 401 }
+    );
+  }
+
+  const response = NextResponse.json({
+    message: "Login realizado com sucesso",
+  });
+
+  // 🍪 Cookie de sessão
+  response.cookies.set("session", String(user.id), {
+    httpOnly: true,
+    path: "/",
+  });
+
+  return response;
 }
