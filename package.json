@@ -9,7 +9,7 @@
     "lint": "eslint . --ext .js,.ts,.jsx,.tsx"
   },
   "dependencies": {
-    "@prisma/client": "^6.19.0",
+    "@prisma/client": "^6.19.1",
     "@tailwindcss/postcss": "^4.1.18",
     "autoprefixer": "^10.4.23",
     "bcryptjs": "^3.0.3",
