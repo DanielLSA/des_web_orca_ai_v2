@@ -1,81 +1,64 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import type { Transaction } from "./TransactionsClient";
 
-type Props = {
-  refresh: number;
-};
-
-type Transaction = {
-  id: number;
-  description: string;
-  amount: number;
-  date: string;
-};
-
-export default function TransactionList({ refresh }: Props) {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [error, setError] = useState<string | null>(null);
-
-  async function loadTransactions() {
-    setError(null);
-
-    const res = await fetch("/api/transactions", {
-      method: "GET",
-      credentials: "include", // garante envio do cookie
-      headers: { Accept: "application/json" },
-      cache: "no-store",
-    });
-
-    // Se não for OK, tente ler texto (pode ser HTML/erro) e mostrar
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      setError(`Erro ao carregar transações: ${res.status} ${res.statusText}${text ? ` | ${text.slice(0, 120)}` : ""}`);
-      setTransactions([]);
-      return;
-    }
-
-    // Se vier vazio, evita json() explodir
-    const raw = await res.text();
-    if (!raw) {
-      setTransactions([]);
-      return;
-    }
-
-    try {
-      const data = JSON.parse(raw);
-      setTransactions(Array.isArray(data) ? data : []);
-    } catch {
-      setError("Resposta inválida da API (não é JSON).");
-      setTransactions([]);
-    }
+export default function TransactionList({
+  transactions,
+  onEdit,
+  onDelete,
+}: {
+  transactions: Transaction[];
+  onEdit: (t: Transaction) => void;
+  onDelete: (id: number) => Promise<void>;
+}) {
+  async function handleDelete(id: number) {
+    const ok = confirm("Deseja excluir esta transação?");
+    if (!ok) return;
+    await onDelete(id);
   }
 
-  useEffect(() => {
-    loadTransactions();
-  }, [refresh]);
+  if (!transactions.length) {
+    return <p>Nenhuma transação cadastrada.</p>;
+  }
 
   return (
-    <div style={{ marginTop: "1rem" }}>
-      <h2>Transações</h2>
+    <ul style={{ marginTop: 8 }}>
+      {transactions.map((t) => (
+        <li
+          key={t.id}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+            padding: "10px 12px",
+            border: "1px solid rgba(255,255,255,.12)",
+            borderRadius: 10,
+            marginBottom: 8,
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ fontWeight: 600 }}>
+              {t.description} — {t.type} — R$ {Number(t.amount).toFixed(2)}
+            </div>
+            <div style={{ opacity: 0.75, fontSize: 12 }}>
+              {t.date ? new Date(t.date).toLocaleString("pt-BR") : ""}
+            </div>
+          </div>
 
-      {error && (
-        <p style={{ color: "salmon" }}>
-          {error}
-        </p>
-      )}
-
-      {transactions.length === 0 && !error ? (
-        <p>Nenhuma transação encontrada.</p>
-      ) : (
-        <ul>
-          {transactions.map((t) => (
-            <li key={t.id}>
-              {t.description} — R$ {t.amount}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={() => onEdit(t)} style={{ padding: "6px 10px" }}>
+              Editar
+            </button>
+            <button
+              onClick={() => handleDelete(t.id)}
+              style={{ padding: "6px 10px" }}
+            >
+              Excluir
+            </button>
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 }
