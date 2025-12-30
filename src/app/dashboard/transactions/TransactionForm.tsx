@@ -1,141 +1,128 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import type { Transaction } from "./TransactionsClient";
+import { useEffect, useState } from "react";
+import { Transaction, TransactionType } from "../DashboardClient";
 
-type TransactionType = "IN" | "OUT";
+type Props = {
+  editing: Transaction | null;
+  onCreate: (data: {
+    description: string;
+    amount: number;
+    type: TransactionType;
+  }) => void;
+  onUpdate: (data: Transaction) => void;
+  onCancel: () => void;
+};
 
 export default function TransactionForm({
   editing,
-  onCancelEdit,
   onCreate,
   onUpdate,
-}: {
-  editing: Transaction | null;
-  onCancelEdit: () => void;
-  onCreate: (payload: { description: string; amount: number; type: TransactionType }) => Promise<void>;
-  onUpdate: (payload: { id: number; description: string; amount: number; type: TransactionType }) => Promise<void>;
-}) {
-  const isEditing = !!editing;
-
+  onCancel,
+}: Props) {
   const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState<string>("");
+  const [amount, setAmount] = useState("");
   const [type, setType] = useState<TransactionType>("IN");
-
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (editing) {
-      setDescription(editing.description ?? "");
-      setAmount(String(editing.amount ?? ""));
-      setType(editing.type ?? "IN");
-      setError(null);
-    } else {
-      setDescription("");
-      setAmount("");
-      setType("IN");
-      setError(null);
+      setDescription(editing.description);
+      setAmount(String(editing.amount));
+      setType(editing.type);
     }
   }, [editing]);
 
-  const canSubmit = useMemo(() => {
-    const descOk = description.trim().length > 0;
-    const value = Number(amount);
-    const amountOk = amount.trim().length > 0 && !Number.isNaN(value);
-    return descOk && amountOk && !submitting;
-  }, [description, amount, submitting]);
-
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    setError(null);
-    const desc = description.trim();
-    const value = Number(amount);
+    const payload = {
+      description,
+      amount: Number(amount),
+      type,
+    };
 
-    if (!desc || Number.isNaN(value)) {
-      setError("Preencha descrição e valor corretamente.");
-      return;
+    if (editing) {
+      onUpdate({ ...payload, id: editing.id, date: editing.date });
+    } else {
+      onCreate(payload);
     }
 
-    try {
-      setSubmitting(true);
-
-      if (isEditing && editing) {
-        await onUpdate({
-          id: editing.id,
-          description: desc,
-          amount: value,
-          type,
-        });
-        onCancelEdit();
-      } else {
-        await onCreate({
-          description: desc,
-          amount: value,
-          type,
-        });
-        setDescription("");
-        setAmount("");
-        setType("IN");
-      }
-    } catch (err: any) {
-      setError(err?.message || "Falha ao salvar.");
-    } finally {
-      setSubmitting(false);
-    }
+    setDescription("");
+    setAmount("");
+    setType("IN");
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginTop: "1rem" }}>
-      <h2 style={{ fontSize: 22, marginBottom: 8 }}>
-        {isEditing ? "Editar Transação" : "Nova Transação"}
-      </h2>
+    <form
+      onSubmit={handleSubmit}
+      style={{
+        display: "flex",
+        gap: 10,
+        marginBottom: "1.2rem",
+        flexWrap: "wrap",
+      }}
+    >
+      <input
+        placeholder="Descrição"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        required
+        style={input}
+      />
 
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-        <input
-          placeholder="Descrição"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          style={{ padding: 8, minWidth: 220 }}
-        />
+      <input
+        type="number"
+        placeholder="Valor"
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
+        required
+        style={input}
+      />
 
-        <input
-          placeholder="Valor"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          style={{ padding: 8, width: 160 }}
-        />
+      <select
+        value={type}
+        onChange={(e) => setType(e.target.value as TransactionType)}
+        style={input}
+      >
+        <option value="IN">Entrada</option>
+        <option value="OUT">Saída</option>
+      </select>
 
-        <select
-          value={type}
-          onChange={(e) => setType(e.target.value as TransactionType)}
-          style={{ padding: 8 }}
-        >
-          <option value="IN">Entrada</option>
-          <option value="OUT">Saída</option>
-        </select>
+      <button type="submit" style={primaryButton}>
+        {editing ? "Salvar" : "Adicionar"}
+      </button>
 
-        <button
-          type="submit"
-          disabled={!canSubmit}
-          style={{ padding: "8px 12px", cursor: canSubmit ? "pointer" : "not-allowed" }}
-        >
-          {submitting ? "Salvando..." : isEditing ? "Salvar" : "Adicionar"}
+      {editing && (
+        <button type="button" onClick={onCancel} style={secondaryButton}>
+          Cancelar
         </button>
-
-        {isEditing && (
-          <button
-            type="button"
-            onClick={onCancelEdit}
-            style={{ padding: "8px 12px" }}
-          >
-            Cancelar
-          </button>
-        )}
-      </div>
-
-      {error && <p style={{ color: "salmon", marginTop: 8 }}>{error}</p>}
+      )}
     </form>
   );
 }
+
+const input: React.CSSProperties = {
+  padding: "8px 10px",
+  borderRadius: 8,
+  border: "1px solid rgba(255,255,255,0.2)",
+  background: "rgba(255,255,255,0.05)",
+  color: "#fff",
+};
+
+const primaryButton: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 8,
+  border: "none",
+  cursor: "pointer",
+  background: "#2563eb",
+  color: "#fff",
+};
+
+const secondaryButton: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 8,
+  border: "1px solid rgba(255,255,255,0.3)",
+  background: "transparent",
+  color: "#fff",
+  cursor: "pointer",
+};

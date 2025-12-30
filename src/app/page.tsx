@@ -1,19 +1,15 @@
-import Card from "@/components/Card";
+import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <section className="grid" style={{ gridTemplateColumns: "1.1fr 1fr" }}>
-      <Card>
-        <h1>Seu plano financeiro começa aqui.</h1>
-        <p>Entenda seu dinheiro, simule metas e siga um plano realista com um coach financeiro inteligente — feito para a realidade brasileira.</p>
-        <div style={{ marginTop: 12 }}>
-          <a className="btn" href="/(app)/dashboard">Ver Demo</a>
-          <a className="btn outline" style={{ marginLeft: 8 }} href="#">Como funciona</a>
-        </div>
-      </Card>
-      <Card>
-        <img src="/hero.png" alt="Painel financeiro ilustrativo" />
-      </Card>
-    </section>
+    <main style={{ padding: "2rem" }}>
+      <h1>Orça.AI</h1>
+      <p>Organize suas finanças de forma simples.</p>
+
+      <div style={{ marginTop: "1rem", display: "flex", gap: "1rem" }}>
+        <Link href="/login">Login</Link>
+        <Link href="/dashboard">Dashboard</Link>
+      </div>
+    </main>
   );
 }

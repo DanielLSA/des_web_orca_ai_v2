@@ -1,60 +1,60 @@
 "use client";
 
-import type { Transaction } from "./TransactionsClient";
+import { Transaction } from "../DashboardClient";
+
+type Props = {
+  transactions: Transaction[];
+  onEdit: (t: Transaction) => void;
+  onDelete: (id: number) => void;
+};
 
 export default function TransactionList({
   transactions,
   onEdit,
   onDelete,
-}: {
-  transactions: Transaction[];
-  onEdit: (t: Transaction) => void;
-  onDelete: (id: number) => Promise<void>;
-}) {
-  async function handleDelete(id: number) {
-    const ok = confirm("Deseja excluir esta transação?");
-    if (!ok) return;
-    await onDelete(id);
-  }
-
-  if (!transactions.length) {
-    return <p>Nenhuma transação cadastrada.</p>;
+}: Props) {
+  if (transactions.length === 0) {
+    return <p style={{ opacity: 0.7 }}>Nenhuma transação registrada.</p>;
   }
 
   return (
-    <ul style={{ marginTop: 8 }}>
+    <ul style={{ listStyle: "none", padding: 0 }}>
       {transactions.map((t) => (
         <li
           key={t.id}
           style={{
             display: "flex",
-            alignItems: "center",
             justifyContent: "space-between",
-            gap: 12,
-            padding: "10px 12px",
-            border: "1px solid rgba(255,255,255,.12)",
-            borderRadius: 10,
+            alignItems: "center",
+            padding: "10px 14px",
             marginBottom: 8,
+            borderRadius: 10,
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.08)",
           }}
         >
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <div style={{ fontWeight: 600 }}>
-              {t.description} — {t.type} — R$ {Number(t.amount).toFixed(2)}
-            </div>
-            <div style={{ opacity: 0.75, fontSize: 12 }}>
-              {t.date ? new Date(t.date).toLocaleString("pt-BR") : ""}
+          <div>
+            <strong>{t.description}</strong>
+            <div style={{ fontSize: 13, opacity: 0.8 }}>
+              {t.type === "IN" ? "Entrada" : "Saída"} — R$ {t.amount.toFixed(2)}
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={() => onEdit(t)} style={{ padding: "6px 10px" }}>
-              Editar
-            </button>
+          <div style={{ display: "flex", gap: 10 }}>
             <button
-              onClick={() => handleDelete(t.id)}
-              style={{ padding: "6px 10px" }}
+              title="Editar"
+              onClick={() => onEdit(t)}
+              style={iconButton}
             >
-              Excluir
+              ✏️
+            </button>
+
+            <button
+              title="Excluir"
+              onClick={() => onDelete(t.id)}
+              style={{ ...iconButton, color: "#ff6b6b" }}
+            >
+              🗑️
             </button>
           </div>
         </li>
@@ -62,3 +62,10 @@ export default function TransactionList({
     </ul>
   );
 }
+
+const iconButton: React.CSSProperties = {
+  background: "transparent",
+  border: "none",
+  cursor: "pointer",
+  fontSize: 16,
+};
