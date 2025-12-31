@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import TransactionForm from "./transactions/TransactionForm";
 import TransactionList from "./transactions/TransactionList";
 import LogoutButton from "./logout-button";
+import AIConsultant from "./AIConsultant";
 
 export type TransactionType = "IN" | "OUT";
 
@@ -21,11 +22,14 @@ export default function DashboardClient() {
   const [loading, setLoading] = useState(true);
 
   async function loadTransactions() {
-    setLoading(true);
-    const res = await fetch("/api/transactions", { cache: "no-store" });
-    const data = await res.json();
-    setTransactions(Array.isArray(data) ? data : []);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const res = await fetch("/api/transactions", { cache: "no-store" });
+      const data = await res.json();
+      setTransactions(Array.isArray(data) ? data : []);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -72,11 +76,11 @@ export default function DashboardClient() {
   const summary = useMemo(() => {
     const entradas = transactions
       .filter((t) => t.type === "IN")
-      .reduce((s, t) => s + t.amount, 0);
+      .reduce((s, t) => s + Number(t.amount), 0);
 
     const saidas = transactions
       .filter((t) => t.type === "OUT")
-      .reduce((s, t) => s + t.amount, 0);
+      .reduce((s, t) => s + Number(t.amount), 0);
 
     return {
       entradas,
@@ -86,39 +90,66 @@ export default function DashboardClient() {
   }, [transactions]);
 
   return (
-    <main style={{ padding: "2rem", maxWidth: 900, margin: "0 auto" }}>
-      <h1 style={{ marginBottom: "1rem" }}>Dashboard</h1>
+    <main
+      style={{
+        padding: "2rem",
+        maxWidth: 980,
+        margin: "0 auto",
+      }}
+    >
+      {/* HEADER */}
+      <header style={{ marginBottom: 18 }}>
+        <h1 style={{ marginBottom: 8, fontSize: 34, fontWeight: 800 }}>
+          Dashboard
+        </h1>
 
-      {/* 🔹 RESUMO FINANCEIRO */}
-      <h2 style={{ fontSize: 20, marginBottom: 10 }}>Resumo Financeiro</h2>
+        <div
+          style={{
+            padding: "14px 16px",
+            borderRadius: 14,
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            maxWidth: 820,
+          }}
+        >
+          <div style={{ fontSize: 14, opacity: 0.9, lineHeight: 1.4 }}>
+            Bem-vindo! Registre suas entradas e saídas e acompanhe seu saldo em
+            tempo real. Pequenos ajustes consistentes fazem o dinheiro render
+            mais.
+          </div>
+        </div>
+      </header>
 
-      <div
-        style={{
-          display: "flex",
-          gap: 16,
-          marginBottom: "1.5rem",
-          flexWrap: "wrap",
-        }}
-      >
-        <SummaryCard title="Entradas" value={summary.entradas} />
-        <SummaryCard title="Saídas" value={summary.saidas} />
-        <SummaryCard title="Saldo" value={summary.saldo} highlight />
-      </div>
+      {/* RESUMO (cards alinhados e centralizados) */}
+      <section style={{ marginBottom: 18 }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+            gap: 14,
+            maxWidth: 760,
+          }}
+        >
+          <SummaryCard title="Entradas" value={summary.entradas} />
+          <SummaryCard title="Saídas" value={summary.saidas} />
+          <SummaryCard title="Saldo" value={summary.saldo} />
+        </div>
+      </section>
 
-      {/* 🔹 FORMULÁRIO */}
-      <TransactionForm
-        editing={editing}
-        onCreate={createTransaction}
-        onUpdate={updateTransaction}
-        onCancel={() => setEditing(null)}
-      />
+      {/* FORM */}
+      <section style={{ marginBottom: 18, maxWidth: 820 }}>
+        <TransactionForm
+          editing={editing}
+          onCreate={createTransaction}
+          onUpdate={updateTransaction}
+          onCancel={() => setEditing(null)}
+        />
+      </section>
 
-      {/* 🔹 LISTA */}
-      <div style={{ marginTop: "1.5rem" }}>
-        <h2 style={{ fontSize: 20, marginBottom: 8 }}>Transações</h2>
-
+      {/* LISTA */}
+      <section style={{ marginBottom: 22, maxWidth: 820 }}>
         {loading ? (
-          <p>Carregando...</p>
+          <p style={{ opacity: 0.85 }}>Carregando...</p>
         ) : (
           <TransactionList
             transactions={transactions}
@@ -126,47 +157,49 @@ export default function DashboardClient() {
             onDelete={deleteTransaction}
           />
         )}
-      </div>
+      </section>
 
-      <div style={{ marginTop: "2rem" }}>
+      {/* IA CONSULTOR */}
+      <section style={{ marginBottom: 22, maxWidth: 820 }}>
+        <AIConsultant />
+      </section>
+
+      {/* LOGOUT (por último) */}
+      <footer style={{ marginTop: 18 }}>
         <LogoutButton />
-      </div>
+      </footer>
     </main>
   );
 }
 
-/* =========================
-   COMPONENTE DE CARD
-========================= */
+function SummaryCard({ title, value }: { title: string; value: number }) {
+  const isSaldo = title.toLowerCase().includes("saldo");
 
-function SummaryCard({
-  title,
-  value,
-  highlight = false,
-}: {
-  title: string;
-  value: number;
-  highlight?: boolean;
-}) {
   return (
     <div
       style={{
-        padding: "16px 20px",
+        padding: "14px 18px",
         borderRadius: 14,
-        background: highlight
-          ? "rgba(0, 180, 120, 0.15)"
-          : "rgba(255,255,255,0.05)",
-        border: highlight
-          ? "1px solid rgba(0,180,120,0.4)"
-          : "1px solid rgba(255,255,255,0.1)",
+        background: "rgba(255,255,255,0.04)",
+        border: "1px solid rgba(255,255,255,0.08)",
         minWidth: 180,
       }}
     >
-      <div style={{ fontSize: 13, opacity: 0.8 }}>{title}</div>
-      <strong style={{ fontSize: 20 }}>
+      <div style={{ fontSize: 13, opacity: 0.8, marginBottom: 6 }}>
+        {title}
+      </div>
+
+      <strong style={{ fontSize: 18, letterSpacing: 0.2 }}>
         R$ {value.toFixed(2)}
       </strong>
+
+      {isSaldo && (
+        <div style={{ marginTop: 8, fontSize: 12, opacity: 0.75 }}>
+          {value >= 0
+            ? "Saldo positivo — mantenha a consistência."
+            : "Saldo negativo — vale revisar suas saídas."}
+        </div>
+      )}
     </div>
   );
 }
-
