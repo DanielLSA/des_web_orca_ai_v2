@@ -2,87 +2,100 @@
 
 O **Orça.AI** é uma aplicação web de **controle financeiro pessoal**, criada para ajudar usuários a organizarem suas finanças de forma **simples, clara e inteligente**, com apoio de **Inteligência Artificial**.
 
-🔗 Repositório oficial:  
-https://github.com/DanielLSA/des_web_orca_ai_v2.git
+---
+
+## 🔗 Links Úteis
+
+- **📂 Apresentação e Slides:** [Acesse no Google Drive](https://drive.google.com/drive/folders/1T8i6Mo-QXFWeoysve7tSPgc-8ttORXR3?usp=sharing)
+- **💻 Repositório Oficial:** [GitHub - DanielLSA/des_web_orca_ai_v2](https://github.com/DanielLSA/des_web_orca_ai_v2.git)
 
 ---
 
 ## ✨ Funcionalidades
 
-- Cadastro e Login de usuários
-- Registro de **entradas e saídas financeiras**
-- **Edição e exclusão** de lançamentos
-- Resumo financeiro automático:
-  - Entradas
-  - Saídas
+- **Autenticação:** Cadastro e Login de usuários seguros.
+- **Gestão de Lançamentos:** Registro rápido de entradas e saídas financeiras.
+- **Controle Total:** Edição e exclusão de lançamentos a qualquer momento.
+- **Dashboard Automático:**
+  - Resumo de Entradas
+  - Resumo de Saídas
   - Saldo em tempo real
-- Consultor Financeiro com IA
-- Interface moderna (tema dark)
+- **🤖 Consultor Financeiro IA:** Insights inteligentes sobre suas finanças.
+- **UI/UX:** Interface moderna com suporte nativo a **Dark Mode**.
 
 ---
 
 ## 🧰 Tecnologias Utilizadas
 
-- **Next.js 14** (App Router)
-- **React + TypeScript**
-- **Prisma ORM**
-- **PostgreSQL (Supabase)**
-- **IA via Groq API**
-- CSS customizado
+| Categoria | Tecnologia |
+| :--- | :--- |
+| **Frontend/Framework** | Next.js 14 (App Router) |
+| **Linguagem** | React + TypeScript |
+| **Banco de Dados** | PostgreSQL (via Supabase) |
+| **ORM** | Prisma |
+| **Inteligência Artificial** | Groq API |
+| **Estilização** | CSS Customizado |
 
 ---
 
 ## 📦 Pré-requisitos
 
-Antes de rodar o projeto, você precisa ter instalado:
+Antes de começar, certifique-se de ter instalado/configurado:
 
-- **Node.js** (recomendado: versão 18 ou 20)
-- **npm**
-- Conta no **Supabase** (PostgreSQL)
-- Chave de API da **Groq**
+- **Node.js** (Versão recomendada: 18 ou 20)
+- **npm** (Gerenciador de pacotes)
+- Conta no **Supabase** (Para o banco PostgreSQL)
+- Chave de API da **Groq** (Para a IA)
 
 ---
 
-## 🔐 Configuração do `.env`
+## 🔐 Configuração do Ambiente (`.env`)
 
-Crie um arquivo `.env` na **raiz do projeto** com o seguinte conteúdo:
+Crie um arquivo chamado `.env` na **raiz do projeto** e preencha com suas credenciais:
 
 ```env
 # Banco de dados (Supabase Postgres)
-DATABASE_URL=postgresql://USUARIO:SENHA@HOST:PORTA/BANCO
+DATABASE_URL="postgresql://USUARIO:SENHA@HOST:PORTA/BANCO"
 
 # API da IA (Groq)
-GROQ_API_KEY=SUA_CHAVE_AQUI
+GROQ_API_KEY="SUA_CHAVE_AQUI"
 
 
-#🚀 Como rodar o projeto localmente
-##1️⃣ Clonar o repositório
-git clone https://github.com/DanielLSA/des_web_orca_ai_v2.git
+
+
+🚀 Como rodar o projeto localmente
+Siga o passo a passo abaixo para iniciar a aplicação:
+
+1️⃣ Clonar o repositório
+Bash
+
+git clone [https://github.com/DanielLSA/des_web_orca_ai_v2.git](https://github.com/DanielLSA/des_web_orca_ai_v2.git)
 cd des_web_orca_ai_v2
+2️⃣ Instalar dependências
+Bash
 
-##2️⃣ Instalar dependências
 npm install
+Nota: Se ocorrer conflito de dependências, utilize o comando abaixo:
 
-Se ocorrer conflito de dependências:
+Bash
 
 npm install --legacy-peer-deps
+3️⃣ Configurar o Banco de Dados (Prisma)
+Gere o cliente do Prisma para tipagem e conexão:
 
-##3️⃣ Gerar o Prisma Client
+Bash
+
 npx prisma generate
+(Opcional) Migrar o banco de dados: Se você estiver criando as tabelas do zero localmente ou no Supabase via código:
 
-##4️⃣ (Opcional) Migrar banco de dados
-
-Se você estiver usando migrations:
+Bash
 
 npx prisma migrate dev
+Caso esteja conectando a um banco já existente no Supabase, este passo pode ser ignorado.
 
+4️⃣ Rodar o projeto
+Inicie o servidor de desenvolvimento:
 
-Caso esteja apontando para um banco já pronto no Supabase, este passo pode ser ignorado.
+Bash
 
-##5️⃣ Rodar o projeto
 npm run dev
-
-
-Acesse no navegador:
-
-http://localhost:3000
