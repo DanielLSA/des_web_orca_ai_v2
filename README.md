@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Orça.AI 💰🤖
 
-## Getting Started
+O **Orça.AI** é uma aplicação web de **controle financeiro pessoal**, criada para ajudar usuários a organizarem suas finanças de forma **simples, clara e inteligente**, com apoio de **Inteligência Artificial**.
 
-First, run the development server:
+🔗 Repositório oficial:  
+https://github.com/DanielLSA/des_web_orca_ai_v2.git
 
-```bash
+---
+
+## ✨ Funcionalidades
+
+- Cadastro e Login de usuários
+- Registro de **entradas e saídas financeiras**
+- **Edição e exclusão** de lançamentos
+- Resumo financeiro automático:
+  - Entradas
+  - Saídas
+  - Saldo em tempo real
+- Consultor Financeiro com IA
+- Interface moderna (tema dark)
+
+---
+
+## 🧰 Tecnologias Utilizadas
+
+- **Next.js 14** (App Router)
+- **React + TypeScript**
+- **Prisma ORM**
+- **PostgreSQL (Supabase)**
+- **IA via Groq API**
+- CSS customizado
+
+---
+
+## 📦 Pré-requisitos
+
+Antes de rodar o projeto, você precisa ter instalado:
+
+- **Node.js** (recomendado: versão 18 ou 20)
+- **npm**
+- Conta no **Supabase** (PostgreSQL)
+- Chave de API da **Groq**
+
+---
+
+## 🔐 Configuração do `.env`
+
+Crie um arquivo `.env` na **raiz do projeto** com o seguinte conteúdo:
+
+```env
+# Banco de dados (Supabase Postgres)
+DATABASE_URL=postgresql://USUARIO:SENHA@HOST:PORTA/BANCO
+
+# API da IA (Groq)
+GROQ_API_KEY=SUA_CHAVE_AQUI
+
+
+#🚀 Como rodar o projeto localmente
+##1️⃣ Clonar o repositório
+git clone https://github.com/DanielLSA/des_web_orca_ai_v2.git
+cd des_web_orca_ai_v2
+
+##2️⃣ Instalar dependências
+npm install
+
+Se ocorrer conflito de dependências:
+
+npm install --legacy-peer-deps
+
+##3️⃣ Gerar o Prisma Client
+npx prisma generate
+
+##4️⃣ (Opcional) Migrar banco de dados
+
+Se você estiver usando migrations:
+
+npx prisma migrate dev
+
+
+Caso esteja apontando para um banco já pronto no Supabase, este passo pode ser ignorado.
+
+##5️⃣ Rodar o projeto
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Acesse no navegador:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+http://localhost:3000
